@@ -1,16 +1,5 @@
 (in-package :co.fwoar.awkish)
 
-(defmacro with-command-output ((s command &rest args &key (output nil output-p)
-                                &allow-other-keys)
-                               &body body)
-  (declare (ignore output))
-  (when output-p
-    (error "can't override :output"))
-  `(let ((,s (uiop:process-info-output
-              (uiop:launch-program ,command :output :stream ,@args))))
-     ,@body))
-
-
 (defvar *client*)
 (defvar *record*)
 (defvar *nr*)
@@ -42,6 +31,9 @@
          (pattern-actions (if end
                               (butlast pattern-actions)
                               pattern-actions))
+         ($0 (intern "$0"))
+         ($* (intern "$*"))
+         ($@ (intern "$@"))
          (binders (when args-p
                     (mapcar (lambda (n)
                               (intern (format nil "$~d" n)))
@@ -49,21 +41,21 @@
     `(block nil
        ,@(cdr begin)
        (let ((*nr* 0))
-         (do-lines ($0 ,s ,client)
-           (declare (ignorable $0))
-           (let* (($* (parse-record *client* $0))
-                  (*record* $*)
-                  (*nf* (field-count *client* $*)))
-             (declare (ignorable $*))
-             (destructuring-bind (&optional ,@binders &rest $@)
-                 (unpack-binders *client* $*)
-               (declare (ignorable $@ ,@binders))
+         (do-lines (,$0 ,s ,client)
+           (declare (ignorable ,$0))
+           (let* ((,$* (parse-record *client* ,$0))
+                  (*record* ,$*)
+                  (*nf* (field-count *client* ,$*)))
+             (declare (ignorable ,$*))
+             (destructuring-bind (&optional ,@binders &rest ,$@)
+                 (unpack-binders *client* ,$*)
+               (declare (ignorable ,$@ ,@binders))
                ,@(mapcar (lambda (it)
                            (if (= 1 (length it))
                                (alexandria:with-gensyms (v)
                                  `(let ((,v ,(car it)))
                                     (when ,v
-                                      (princ $0)
+                                      (princ ,$0)
                                       (terpri))))
                                (let ((pattern (car it))
                                      (rest (cdr it)))
@@ -115,7 +107,7 @@
 
  (spinneret:with-html
    (:table
-    (with-command-output (s "ps aux")
+    (co.fwoar.awkish.util:with-command-output (s "ps aux")
       (awk (s :args 9)
         (:begin (:thead (:th "first") (:th "second")))
         (t (:tr (:td $1) (:td $2) (:td $3 "%") (:td $4)
@@ -123,7 +115,7 @@
         (:end (:tfoot (:td "end first") (:td "end second")))))))
 
  (serapeum:with-collector (c)
-   (with-command-output (s "ps aux")
+   (co.fwoar.awkish:with-command-output (s "ps aux")
      (awk (s :args 10)
        ((> *nf* 30) (c *nf* (car $@))))))
 

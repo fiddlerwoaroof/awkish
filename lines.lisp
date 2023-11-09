@@ -8,14 +8,17 @@
   ((%pos :initform 0 :accessor lines-pos)))
 
 (defmethod resolve-column ((client lines) (record cons) (column-designator number))
-  (let ((column-designator (1- column-designator)))
-    (with-slots (%column-cache) client
-      ;; manually tuned
-      (if (> column-designator 60)
-          (alexandria:ensure-gethash column-designator
-                                     %column-cache
-                                     (nth column-designator record))
-          (nth column-designator record)))))
+  (if (= column-designator 0)
+      record
+      (let ((column-designator (1- column-designator)))
+        (with-slots (%column-cache) client
+          ;; manually tuned
+          (if (> column-designator 60)
+              (alexandria:ensure-gethash column-designator
+                                         %column-cache
+                                         (nth column-designator record))
+              (nth column-designator record))))))
+
 (defmethod parse-record ((client lines) (raw-record string))
   (serapeum:tokens raw-record))
 (defmethod field-count ((client lines) (record list))

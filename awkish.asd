@@ -1,5 +1,4 @@
 ;;; -*- Mode:Lisp; Syntax:ANSI-Common-Lisp; Package: ASDF-USER -*-
-(in-package :asdf-user)
 
 (defsystem :awkish
   :description ""
@@ -7,12 +6,22 @@
   :license "MIT"
   :depends-on (#:alexandria
                #:data-lens/beta/transducers
-               #:named-readtables
                #:serapeum
                #:spinneret
-               #:uiop
-               #:yason)
+               #:uiop)
   :serial t
   :components ((:file "package")
+               (:file "util")
+               (:file "protocol")
                (:file "awkish")
-               ))
+               (:file "lines")))
+
+(defsystem :awkish/readtable
+  :depends-on (#:awkish
+               #:named-readtables)
+  :components ((:file "readtable")))
+
+(defsystem :awkish/ndjson
+  :depends-on (#:awkish
+               #:yason)
+  :components ((:file "ndjson")))

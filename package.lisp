@@ -4,46 +4,23 @@
 (in-package :co.fwoar.awkish.package)
 
 (defpackage :co.fwoar.awkish.util
-  (:use :cl )
-  (:export #:tm))
+  (:use :cl)
+  (:export #:tm #:with-command-output))
 
 (defpackage :co.fwoar.awkish.protocol
-  (:use :cl )
-  (:import-from :co.fwoar.awkish.util
-                #:tm)
-  (:export #:*eof-sentinel*
-           #:make-client
-           #:next-record
-           #:parse-record
-           #:unpack-binders
-           #:field-count
-           #:resolve-column
-           #:*eof-sentinel*))
+  (:use :cl)
+  (:import-from :co.fwoar.awkish.util #:tm)
+  (:export #:*eof-sentinel* #:*eof-sentinel* #:field-count
+           #:make-client #:next-record #:parse-record #:resolve-column
+           #:unpack-binders))
 
 (defpackage :co.fwoar.awkish.lines
   (:use :cl :co.fwoar.awkish.protocol)
-  (:export ))
-
-(defpackage :co.fwoar.awkish.readtable
-  (:use :cl)
-  (:export ))
-
+  (:export))
 
 (defpackage :co.fwoar.awkish
   (:use :cl :co.fwoar.awkish.protocol)
-  (:export #:*eof-sentinel*
-           #:make-client
-           #:next-record
-           #:parse-record
-           #:unpack-binders
-           #:field-count
-           #:resolve-column
-           #:*client*
-           #:*nr*
-           #:*nf*
-           #:*record*
-           #:awk
-           #:*pattern-binds*
-           #:~
-           #:defawk
-           #:with-command-output))
+  (:export #:*client* #:*eof-sentinel* #:*nf* #:*nr* #:*pattern-binds*
+           #:*record* #:awk #:defawk #:field-count #:make-client #:next-record
+           #:parse-record #:resolve-column #:unpack-binders
+           #:with-command-output #:~))
